@@ -9,9 +9,10 @@ class MyApp extends StatefulWidget {
   _MyAppState createState() => _MyAppState();
 }
 
-class _MyAppState extends State<MyApp>{
-  double height, width;
+class _MyAppState extends State<MyApp> {
   bool opened = false;
+  double size = 80;
+  Color color = Colors.red;
 
   @override
   void initState() {
@@ -25,96 +26,108 @@ class _MyAppState extends State<MyApp>{
 
   @override
   Widget build(BuildContext context) {
-    width = MediaQuery.of(context).size.width;
-    height = MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: AppBar(
         title: Text("Extended Button"),
       ),
-      body: Container(
-        width: width,
-        height: height,
-        child: getExtendedButton(),
+      body: Center(
+        child: Container(
+          width: size,
+          height: size,
+          child: getExtendedButton(),
+        ),
       ),
     );
   }
 
   getExtendedButton() {
-    return Stack(
-      children: <Widget>[
-        Positioned(
-          top: height / 2 - 32,
-          left: width / 2 - 32,
-          child: AnimatedContainer(
-            duration: Duration(milliseconds: 500),
-            alignment: Alignment.center,
-            height: 64,
-            width: 64,
-            decoration: BoxDecoration(
-                color: opened
-                    ? Color.fromRGBO(18, 18, 18, 0.6)
-                    : Color(0xff121212),
-                borderRadius: BorderRadius.circular(opened ? 32 : 0)),
-            child: InkWell(
-              child: Icon(
-                opened ? Icons.clear : Icons.add,
-                color: Colors.white,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        double height = constraints.maxHeight;
+        double width = constraints.maxWidth;
+        return Stack(
+          children: <Widget>[
+            Positioned(
+              top: constraints.maxHeight / 2 - calculateValue(32),
+              left: constraints.maxWidth / 2 - calculateValue(32),
+              child: AnimatedContainer(
+                duration: Duration(milliseconds: 500),
+                alignment: Alignment.center,
+                height: calculateValue(64),
+                width: calculateValue(64),
+                decoration: BoxDecoration(
+                    color: opened ? color.withOpacity(0.6) : color,
+                    borderRadius:
+                        BorderRadius.circular(opened ? calculateValue(32) : 0)),
+                child: InkWell(
+                  child: Transform.rotate(
+                    angle: opened ? 0.75 : 0,
+                    child: Icon(
+                      Icons.add,
+                      color: Colors.white,
+                    ),
+                  ),
+                  onTap: () {
+                    setState(() {
+                      opened = !opened;
+                    });
+                  },
+                ),
               ),
-              onTap: () {
-                setState(() {
-                  opened = !opened;
-                });
-              },
             ),
-          ),
-        ),
-        getSquareButton(
-            icon: Icons.attach_file,
-            closedTop: height / 2 - 32,
-            openedTop: height / 2 - 50,
-            openedLeft: width / 2 - 50,
-            closedLeft: width / 2 - 32,
-            onClick: () {
-              print("Attach Filed Pressed");
-            }),
-        getSquareButton(
-            icon: Icons.attach_file,
-            closedTop: height / 2 - 32,
-            openedTop: height / 2 - 50,
-            openedLeft: width / 2 + 10,
-            closedLeft: width / 2 + 2,
-            onClick: () {
-              print("Attach Filed Pressed");
-            }),
-        getSquareButton(
-            icon: Icons.share,
-            closedTop: height / 2 - 32,
-            openedTop: height / 2 - 50,
-            openedLeft: width / 2 + 10,
-            closedLeft: width / 2 + 2,
-            onClick: () {
-              print("Share Pressed");
-            }),
-        getSquareButton(
-            icon: Icons.camera,
-            closedTop: height / 2 + 2,
-            openedTop: height / 2 + 10,
-            openedLeft: width / 2 + 10,
-            closedLeft: width / 2 + 2,
-            onClick: () {
-              print("Camera Pressed");
-            }),
-        getSquareButton(
-            icon: Icons.send,
-            closedTop: height / 2 + 2,
-            openedTop: height / 2 + 10,
-            openedLeft: width / 2 - 50,
-            closedLeft: width / 2 - 32,
-            onClick: () {
-              print("Send Pressed");
-            })
-      ],
+            getSquareButton(
+                icon: Icons.attach_file,
+                closedTop: height / 2 - calculateValue(32),
+                openedTop: height / 2 - calculateValue(50),
+                openedLeft: width / 2 - calculateValue(50),
+                closedLeft: width / 2 - calculateValue(32),
+                onClick: () {
+                  print("Attach Filed Pressed");
+                }),
+            getSquareButton(
+                icon: Icons.attach_file,
+                closedTop: height / 2 - calculateValue(32),
+                openedTop: height / 2 - calculateValue(50),
+                openedLeft: width / 2 + calculateValue(10),
+                closedLeft: width / 2 + calculateValue(2),
+                onClick: () {
+                  print("Attach Filed Pressed");
+                }),
+            getSquareButton(
+                icon: Icons.share,
+                closedTop: height / 2 - calculateValue(32),
+                openedTop: height / 2 - calculateValue(50),
+                openedLeft: width / 2 + calculateValue(10),
+                closedLeft: width / 2 + calculateValue(2),
+                onClick: () {
+                  print("Share Pressed");
+                }),
+            getSquareButton(
+                icon: Icons.camera,
+                closedTop: height / 2 + calculateValue(2),
+                openedTop: height / 2 + calculateValue(10),
+                openedLeft: width / 2 + calculateValue(10),
+                closedLeft: width / 2 + calculateValue(2),
+                onClick: () {
+                  print("Camera Pressed");
+                }),
+            getSquareButton(
+                icon: Icons.send,
+                closedTop: height / 2 + calculateValue(2),
+                openedTop: height / 2 + calculateValue(10),
+                openedLeft: width / 2 - calculateValue(50),
+                closedLeft: width / 2 - calculateValue(32),
+                onClick: () {
+                  print("Send Pressed");
+                })
+          ],
+        );
+      },
     );
+  }
+
+  calculateValue(int value) {
+    return size * value / 106;
   }
 
   getSquareButton(
@@ -129,30 +142,25 @@ class _MyAppState extends State<MyApp>{
       curve: Curves.easeIn,
       top: opened ? openedTop : closedTop,
       left: opened ? openedLeft : closedLeft,
-      child: InkWell(
-        onTap: opened
-            ? null
-            : () {
-                setState(() {
-                  opened = !opened;
-                });
-              },
-        child: AnimatedContainer(
-          duration: Duration(milliseconds: 500),
-          width: opened ? 40 : 30,
-          height: opened ? 40 : 30,
-          child: IconButton(
-            icon: Icon(
-              icon,
-              size: 20,
-              color: opened ? Colors.white : Colors.transparent,
-            ),
-            onPressed: opened ? onClick : null,
+      child: AnimatedContainer(
+        alignment: Alignment.center,
+        duration: Duration(milliseconds: 500),
+        width: opened ? calculateValue(40) : calculateValue(30),
+        height: opened ? calculateValue(40) : calculateValue(30),
+        child: GestureDetector(
+          onTap: () {
+            print("Clicked");
+          },
+          child: Icon(
+            icon,
+            size: calculateValue(20),
+            color: opened ? Colors.white : Colors.transparent,
           ),
-          decoration: BoxDecoration(
-              color: Color(0xff121212),
-              borderRadius: BorderRadius.circular(opened ? 5 : 0)),
         ),
+        decoration: BoxDecoration(
+            color: color,
+            borderRadius:
+                BorderRadius.circular(opened ? calculateValue(5) : 0)),
       ),
     );
   }
